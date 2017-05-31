@@ -1,37 +1,172 @@
-## Welcome to GitHub Pages
+AppClient
 
-You can use the [editor on GitHub](https://github.com/coderbaba1/multithreading/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.net.*;
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+public class AppClient extends Frame implements
+ActionListener, Runnable
+{
+Button b1;
+TextField tf;
+TextArea ta;
+Socket s;
+PrintWriter pw;
+BufferedReader br;
+Thread th;
 
-### Markdown
+public AppClient()
+{
+Frame f= new Frame("Client side chatting");
+f.setLayout(new FlowLayout());
+f.setBackground(Color.orange);
+b1=new Button("Send");
+b1.setBackground(Color.pink);
+b1.addActionListener(this);
+tf=new TextField(15);
+ta=new TextArea(12,20);
+ta.setBackground(Color.cyan);
+f.addWindowListener(new W1());
+f.add(tf);
+f.add(b1);
+f.add(ta);
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+try{
+s=new Socket(InetAddress.getLocalHost(), 12004);
 
-```markdown
-Syntax highlighted code block
+br=new BufferedReader(new InputStreamReader(s.getInputStream()));
+pw=new PrintWriter(s.getOutputStream(), true);
+}
 
-# Header 1
-## Header 2
-### Header 3
+catch(Exception e){}
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
+th=new Thread(this);
+th.setDaemon(true);
+th.start();
+setFont(new Font("Arial", Font.BOLD, 20));
+f.setSize(200, 200);
+f.setLocation(300, 300);
+f.setVisible(true);
+f.validate();
+}
+private class W1 extends WindowAdapter
+{
+public void windowClosing(WindowEvent we)
+{
+System.exit(0);
+}
+}
+public void actionPerformed(ActionEvent ae)
+{
+pw.println(tf.getText());
+tf.setText("");
+}
+public void run()
+{
+while(true)
+{
+try{
+ta.append(br.readLine() + "\n");
+}
+catch(Exception e)
+{
+}
+}
+}
+public static void main(String args[])
+{
+AppClient client= new AppClient();
+}
+}
 
-**Bold** and _Italic_ and `Code` text
 
-[Link](url) and ![Image](src)
-```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+Appserver
 
-### Jekyll Themes
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.net.*;
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/coderbaba1/multithreading/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+public class AppServer extends Frame implements
+ActionListener, Runnable
+{
+Button b1;
+TextField tf;
+TextArea ta;
+ServerSocket ss;
+Socket s;
+PrintWriter pw;
+BufferedReader br;
+Thread th;
 
-### Support or Contact
+public AppServer()
+{
+Frame f= new Frame("Server side chatting");
+f.setLayout(new FlowLayout());
+f.setBackground(Color.orange);
+b1=new Button("Send");
+b1.setBackground(Color.pink);
+b1.addActionListener(this);
+tf=new TextField(15);
+ta=new TextArea(12,20);
+ta.setBackground(Color.cyan);
+f.addWindowListener(new W1());
+f.add(tf);
+f.add(b1);
+f.add(ta);
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+try{
+ss=new ServerSocket(12004);
+s=ss.accept();
+br=new BufferedReader(new InputStreamReader(s.getInputStream()));
+pw=new PrintWriter(s.getOutputStream(), true);
+}
+
+catch(Exception e){}
+
+
+th=new Thread(this);
+th.setDaemon(true);
+th.start();
+setFont(new Font("Arial", Font.BOLD, 20));
+f.setSize(200, 200);
+f.setLocation(300, 300);
+f.setVisible(true);
+f.validate();
+}
+private class W1 extends WindowAdapter
+{
+public void windowClosing(WindowEvent we)
+{
+System.exit(0);
+}
+}
+public void actionPerformed(ActionEvent ae)
+{
+pw.println(tf.getText());
+tf.setText("");
+}
+public void run()
+{
+while(true)
+{
+try{
+ta.append(br.readLine() + "\n");
+}
+catch(Exception e)
+{
+}
+}
+}
+public static void main(String args[])
+{
+AppServer a= new AppServer();
+}
+}
+
+
+
+
